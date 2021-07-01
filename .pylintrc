@@ -1,0 +1,5 @@
+[FORMAT]
+max-line-length=80
+
+[MASTER]
+extension-pkg-whitelist=pydantic
