@@ -10,7 +10,7 @@ from pydantic import Field
 
 class DeckBase(Base):
     name: str
-    description: str = ""
+    description: Optional[str] = None
 
 
 class DeckCreate(DeckBase):
@@ -29,8 +29,8 @@ class DeckManager:
     collection: Collection = database.get_collection("decks")
 
     @classmethod
-    async def retrieve(cls, object_id: str) -> Optional[Deck]:
-        deck = await cls.collection.find_one({"_id": ObjectId(object_id)})
+    async def retrieve(cls, object_id: ObjectId) -> Optional[Deck]:
+        deck = await cls.collection.find_one({"_id": object_id})
         if deck:
             return Deck.parse_obj(deck)
         return None
@@ -47,18 +47,20 @@ class DeckManager:
         return Deck.parse_obj(new_deck)
 
     @classmethod
-    async def update(cls, object_id: str, deck: DeckCreate) -> Optional[Deck]:
+    async def update(
+        cls, object_id: ObjectId, deck: DeckCreate
+    ) -> Optional[Deck]:
         result = await cls.collection.update_one(
-            {"_id": ObjectId(object_id)}, {"$set": deck.dict()}
+            {"_id": object_id}, {"$set": deck.dict()}
         )
         if result.modified_count > 0:
-            deck = await cls.collection.find_one({"_id": ObjectId(object_id)})
+            deck = await cls.collection.find_one({"_id": object_id})
             return Deck.parse_obj(deck)
         return None
 
     @classmethod
-    async def delete(cls, object_id: str) -> bool:
-        result = await cls.collection.delete_one({"_id": ObjectId(object_id)})
+    async def delete(cls, object_id: ObjectId) -> bool:
+        result = await cls.collection.delete_one({"_id": object_id})
         return result.deleted_count > 0
 
 

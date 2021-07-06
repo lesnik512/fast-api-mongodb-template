@@ -6,7 +6,7 @@ from app.config import settings
 
 def get_app() -> FastAPI:
     application = FastAPI(title=settings.SERVICE_NAME, debug=settings.DEBUG)
-    application.include_router(decks_router, prefix="/api/decks")
+    application.include_router(decks_router, prefix="/api")
     return application
 
 

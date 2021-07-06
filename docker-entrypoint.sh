@@ -15,10 +15,10 @@ case "$1" in
         black --config pyproject.toml --check .
         pylint --rcfile=.pylintrc --errors-only app
         mypy .
-        pytest -s -vv tests/
+        MONGO_DB_NAME='test' pytest -s -vv tests/
         ;;
     pytest)
-        pytest -s -vv -x tests/
+        MONGO_DB_NAME='test' pytest -s -vv -x tests/
         ;;
     *)
         exec "$@"
