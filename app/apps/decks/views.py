@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from starlette.responses import Response
 
 from app.apps.decks import models
+from app.pydantic import PyObjectId
 
 
 decks_router = APIRouter()
@@ -13,15 +14,17 @@ async def list_decks() -> models.Decks:
 
 
 @decks_router.get("/decks/{deck_id}/", response_model=models.Deck)
-async def get_deck(deck_id: str) -> models.Deck:
+async def get_deck(deck_id: PyObjectId) -> models.Deck:
     instance = await models.DeckManager.retrieve(deck_id)
     if not instance:
         raise HTTPException(status_code=404, detail="Deck is not found")
     return instance
 
 
-@decks_router.put("/decks/{deck_id}/", response_model=models.DeckCreate)
-async def update_deck(deck_id: str, data: models.DeckCreate) -> models.Deck:
+@decks_router.put("/decks/{deck_id}/", response_model=models.Deck)
+async def update_deck(
+    deck_id: PyObjectId, data: models.DeckCreate
+) -> models.Deck:
     instance = await models.DeckManager.update(deck_id, data)
     if not instance:
         raise HTTPException(status_code=404, detail="Deck is not found")
@@ -36,7 +39,7 @@ async def create_deck(data: models.DeckCreate) -> models.Deck:
 @decks_router.delete(
     "/decks/{deck_id}/", status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_deck(deck_id: str) -> Response:
+async def delete_deck(deck_id: PyObjectId) -> Response:
     is_deleted = await models.DeckManager.delete(deck_id)
     if not is_deleted:
         raise HTTPException(status_code=404, detail="Deck is not found")
