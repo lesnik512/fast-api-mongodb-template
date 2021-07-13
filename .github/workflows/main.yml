@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: bitnami/mongodb:latest
+        env:
+          MONGO_INITDB_ROOT_USERNAME: ${APP_MONGO_USER}
+          MONGO_INITDB_ROOT_PASSWORD: ${APP_MONGO_PASS}
+          MONGO_INITDB_DATABASE: ${APP_MONGO_DB}
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: docker-ci-action
+        uses: ./
+        env:
+          MONGO_DETAILS=mongodb://mongodb:27017
