@@ -1,8 +1,12 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    types: [labeled]
+    branches:
+      - main
 
 jobs:
   action:
@@ -15,8 +19,18 @@ jobs:
           - 27017:27017
     steps:
       - uses: actions/checkout@v1
-
-      - name: docker-ci-action
-        uses: ./
+      
+      - name: install python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+          
+      - name: install requirements
+        run: pip3 install --no-cache-dir -r requirements.prod.txt -r requirements.dev.txt
+        
+      - name: run checks and tests
+        run: ./docker-entrypoint.sh tests
         env:
-          MONGO_DETAILS: "mongodb://mongodb:27017"
+          PYTHONDONTWRITEBYTECODE: 1
+          PYTHONUNBUFFERED: 1
+          MONGO_DETAILS: "mongodb://127.0.0.1:27017"
